@@ -29,6 +29,7 @@
 
 
         <Button Content="Update Product"
+                Click="Update_Product_Clikc"
                 Style="{StaticResource btnStyle}"
                 Grid.Row="2"/>
 

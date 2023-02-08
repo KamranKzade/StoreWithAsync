@@ -61,7 +61,7 @@ namespace StoreWithAsync
                 conn.Open();
 
                 SqlCommand command = conn.CreateCommand();
-                command.CommandText = "WAITFOR DELAY '00:00:05';";
+                command.CommandText = "WAITFOR DELAY '00:00:03';";
                 command.CommandText += "Select * From Products";
 
 
