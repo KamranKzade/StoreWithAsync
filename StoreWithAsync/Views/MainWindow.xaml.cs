@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Windows;
+using StoreWithAsync.Views;
 using System.Configuration;
 using System.Data.SqlClient;
 
@@ -16,7 +17,22 @@ namespace StoreWithAsync
 
         private void Update_Product_Click(object sender, RoutedEventArgs e)
         {
+            int Id = 0;
+            var obj = myDataGrid.SelectedItem;
+            var selectedPro = obj as DataRowView;
 
+            if (selectedPro != null)
+            {
+                Id = int.Parse(selectedPro.Row.ItemArray[0].ToString());
+            }
+
+            if (obj is null)
+                MessageBox.Show("Productlardan birini secin, zehmet olmasa", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+            else
+            {
+                UpdateWindow window = new UpdateWindow(Id);
+                window.ShowDialog();
+            }
         }
 
         private async void Show_Product_Click(object sender, RoutedEventArgs e)
@@ -87,32 +103,38 @@ namespace StoreWithAsync
 
         private void Delete_Product_Click(object sender, RoutedEventArgs e)
         {
+            int Id = 0;
             var obj = myDataGrid.SelectedItem;
             var selectedPro = obj as DataRowView;
-            var Id = selectedPro.Row.ItemArray[0];
 
-            MessageBox.Show(Id.ToString());
+            if (selectedPro != null)
+                Id = int.Parse(selectedPro.Row.ItemArray[0].ToString());
 
-            using (var conn = new SqlConnection())
+            if (obj is null)
+                MessageBox.Show("Productlardan birini secin, zehmet olmasa", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+            else
             {
-                SqlDataAdapter dataAdapter = new SqlDataAdapter();
-                conn.ConnectionString = ConfigurationManager.ConnectionStrings["MyConnString"].ConnectionString;
-                conn.Open();
-                DataSet dataSet = new DataSet();
+                using (var conn = new SqlConnection())
+                {
+                    SqlDataAdapter dataAdapter = new SqlDataAdapter();
+                    conn.ConnectionString = ConfigurationManager.ConnectionStrings["MyConnString"].ConnectionString;
+                    conn.Open();
+                    DataSet dataSet = new DataSet();
 
-                SqlCommand command = new SqlCommand("Select * From Products", conn);
-                
-                dataAdapter.SelectCommand= command;
-                dataAdapter.Fill(dataSet, "Products");
+                    SqlCommand command = new SqlCommand("Select * From Products", conn);
 
-                command = new SqlCommand($"Delete From Products Where ProductId={Id}",conn);          
-                dataAdapter.UpdateCommand= command;
-                dataAdapter.Update(dataSet, "Products");
-                dataAdapter.UpdateCommand.ExecuteNonQuery();
+                    dataAdapter.SelectCommand = command;
+                    dataAdapter.Fill(dataSet, "Products");
+
+                    command = new SqlCommand($"Delete From Products Where ProductId={Id}", conn);
+                    dataAdapter.UpdateCommand = command;
+                    dataAdapter.Update(dataSet, "Products");
+                    dataAdapter.UpdateCommand.ExecuteNonQuery();
 
 
 
-                dataAdapter.Fill(dataSet, "Products");
+                    dataAdapter.Fill(dataSet, "Products");
+                }
             }
         }
     }
